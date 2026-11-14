@@ -5,7 +5,7 @@ on:
 
 jobs:
   build-ios:
-    runs-on: macos-latest
+    runs-on: macos-15
 
     steps:
       - name: Checkout repository
@@ -19,6 +19,12 @@ jobs:
 
       - name: Install JavaScript dependencies
         run: yarn install --frozen-lockfile
+
+      - name: Create .env and Env.xcconfig
+        run: |
+          if [ -f .env.example ]; then cp .env.example .env; else touch .env; fi
+          mkdir -p ios/Config
+          if [ -f ios/Config/Env.xcconfig.example ]; then cp ios/Config/Env.xcconfig.example ios/Config/Env.xcconfig; else touch ios/Config/Env.xcconfig; fi
 
       - name: Set up Ruby & CocoaPods
         uses: ruby/setup-ruby@v1
@@ -42,6 +48,7 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
+            DEVELOPMENT_TEAM="" \
             archive
 
       - name: Package Unsigned IPA
